@@ -4,6 +4,9 @@ LogTrace
 Aggregate messages to produce a log entry representing a single event or procedure.
 
 ```
+import logging
+from logtrace import LogTrace
+
 logger = logging.getLogger(__name__)
 trace = LogTrace(logger=logger)
 
@@ -24,6 +27,15 @@ You get a single log entry like this:
 
 The purpose of this module is to easily asssociate log messages
 together that belong together.
+
+Install
+-------
+
+	pip install logtrace
+
+If your log level is `logging.INFO` and you call `logtrace.emit_debug()`, nothing is sent to the
+
+What LogTrace is *not*: This is *not* a logging framework. LogTrace uses the standard Python `logging` module. All your configuration to `logging` is going to be used by LogTrace. All your handlers are going to be act exactly as before. If you use a framework like Django, you use it just like you do now. No changes whatever are required to your logging configuration. 
 
 We also provide other features like
 
@@ -52,9 +64,20 @@ features and no external dependencies (outside the PSL).
             )
 ```
 
-## Testing
+`logger`: the standard logger returned from `import logging; logger = logging.getLogger(__name__)`. You can create a `LogTrace()` without a logger in which case it creates one called "logtrace". 
+`delimiter`: the character(s) used between messages
+`tag`: This is a convenience to tell LogTrace() to use hash+tag at the start of every entry after calling `.emit()` for easy of searching.
+`unique_id`: generate a uuid to associate with the final message output.
+`level`: 
+
+
+Testing
+-------
 
 	pip install pytest
- 	pytest strgen/test.py --verbose
+ 	pytest logtrace/test.py --verbose
 
+
+Performance
+-----------
 

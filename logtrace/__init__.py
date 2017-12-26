@@ -72,17 +72,23 @@ class LogTrace(object):
                  delimiter="; ",  # delimiter between parts
                  tag='',  # add a label to the log entry, non-unique
                  unique_id=False,  # create a uuid to identify the log?
-                 level=logging.DEBUG):
+                 level=None,
+                 verbosity='v'):
         self.uid = None
+        self.verbosity = verbosity
         self.data = {}
         if logger:
             self.logger = logger
         else:
             self.logger = logging.getLogger("logtrace")
         self.delimiter = delimiter
-        self.level = level
-        self.tag = tag
+        if level:
+            self.level = level
+        else:
+            self.level = self.logger.getEffectiveLevel()
+
         self.event_log = []
+
         if tag:  # prepend log record tag
             if not tag[0] == '#':
                 tag = '#' + tag
@@ -103,22 +109,28 @@ class LogTrace(object):
         Accepts a string or uuid. Adds it to self.uid as a uuid. 
         We want to not care which it is. Any string can be used for this. 
         """
-        # if not isinstance(uid, uuid.UUID):
-        #    uid = uuid.UUID(uid)
+        if not (isinstance(uid, uuid.UUID) or isinstance(uid, str)):
+            uid = str(uid)
         self.uid = uid
 
     def _add_message(self, msg, backup=1):
         """Append msg to logs only if log level is effective."""
-        if not self.logger.getEffectiveLevel() >= self.level:
-            print("WARNING, not adding message, effective level: {}, level={}".format(self.logger.getEffectiveLevel(), self.level))
+        if not self.logger.getEffectiveLevel() >= self.logger.level:
+            print("WARNING, not adding message, effective level: {}, level={}".format(self.logger.getEffectiveLevel(), self.logger.level))
             return
 
         f = inspect.currentframe()
         for __ in range(backup):
             f = f.f_back
             i = inspect.getframeinfo(f)
-        msg = "[{0}, {1:.4f}s] {2}".format(i.lineno, time.time() - self.start, msg)
-
+        if self.verbosity == 'v':
+            msg = "[{0}, {1:.4f}s] {2}".format(i.lineno, time.time() - self.start, msg)
+        elif self.verbosity == 'vv':
+            msg = "[{0}:{1}, {2:.4f}s] {3}".format(i.function,
+                                                   i.lineno, time.time() - self.start, msg)
+        elif self.verbosity == 'vvv':
+            msg = "[{0}.{1}:{2}, {3:.4f}s] {4}".format(i.filename, i.function,
+                                                      i.lineno, time.time() - self.start, msg)
         self.event_log.append(msg)
 
     def _add_data(self, data):
@@ -163,6 +175,9 @@ class LogTrace(object):
         for the actually relevant caller
 
         """
+        if not self.logger.getEffectiveLevel() >= self.logger.level:
+            return
+        
         if not delimiter:
             delimiter = self.delimiter
 

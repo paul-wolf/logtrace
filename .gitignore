@@ -1,5 +1,5 @@
 *.py[cod]
-
+.cache
 *~
 venv*
 env3

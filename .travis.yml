@@ -8,6 +8,7 @@ python:
   - "3.5"
   - "3.5"
   - "3.6"
+  - "3.7-dev"  # 3.7 development branch
   - "nightly" # currently points to 3.6-dev
 
 # command to install dependencies
@@ -15,8 +16,7 @@ python:
 # we have no third-party dependencies
 
 script:
-  python logtrace/test.py
-
+  pytest logtrace/test.py
 
 
 
