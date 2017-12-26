@@ -16,7 +16,5 @@ python:
 # we have no third-party dependencies
 
 script:
-#  pytest logtrace/test.py
-   python logtrace/test.py
-
-
+	pytest logtrace/test.py
+	#   python logtrace/test.py

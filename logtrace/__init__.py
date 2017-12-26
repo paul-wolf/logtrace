@@ -1,7 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-from __future__ import print_function
-from __future__ import absolute_import
 
 # Copyright (c) 2013-2015, Yewleaf Ltd.
 # All rights reserved.
@@ -37,12 +34,8 @@ from __future__ import absolute_import
 
 import uuid
 import time
-import socket
 import inspect
 import logging
-import warnings
-
-# logger = logging.getLogger(__name__)
 
 __version__ = '0.0.1'
 __author__ = 'Paul Wolf'

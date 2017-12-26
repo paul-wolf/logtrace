@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import uuid
 import unittest
-from . import LogTrace
 import logging
+from __init__ import LogTrace
 
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s %(levelname)-8s %(message)s',
