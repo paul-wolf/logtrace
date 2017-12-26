@@ -17,4 +17,4 @@ python:
 
 script:
 	pytest logtrace/test.py
-	#   python logtrace/test.py
+

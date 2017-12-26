@@ -1,6 +1,8 @@
 LogTrace
 ========
 
+[![Build Status](https://travis-ci.org/paul-wolf/logtrace.svg?branch=master)](https://travis-ci.org/paul-wolf/logtrace)
+
 Aggregate messages to produce a log entry representing a single event or procedure.
 
 ```
