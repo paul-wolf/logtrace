@@ -73,7 +73,7 @@ class LogTrace(object):
         if logger:
             self.logger = logger
         else:
-            self.logger = logging.getLogger("logtrace")
+            self.logger = logging.getLogger(__name__)
         self.delimiter = delimiter
         if level:
             self.level = level

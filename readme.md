@@ -35,9 +35,11 @@ Install
 
 	pip install logtrace
 
-If your log level is `logging.INFO` and you call `logtrace.emit_debug()`, nothing is sent to the
+Note that this only suppports Python 3. Let me know if anyone wants support for Python 2. There are no dependencies outside the Python Standard Library for this module. 
 
-What LogTrace is *not*: This is *not* a logging framework. LogTrace uses the standard Python `logging` module. All your configuration to `logging` is going to be used by LogTrace. All your handlers are going to be act exactly as before. If you use a framework like Django, you use it just like you do now. No changes whatever are required to your logging configuration. 
+We respect logging levels. So, the overhead of using LogTrace is minimal if your log level is not effective. If your log level is `logging.INFO` and you call `logtrace.emit_debug()`, almost all overhead is avoided minus some function call overhead and one or two conditional expressions. 
+
+What LogTrace is *not*: This is *not* a logging framework. LogTrace uses the standard Python `logging` module. All your configuration to `logging` is going to be used by LogTrace. All your handlers are going to act exactly as before. If you use a framework like Django, you use it just like you do now. No changes whatever are required to your logging configuration. 
 
 We also provide other features like
 
@@ -45,7 +47,7 @@ We also provide other features like
 
 * Timings for each message.
 
-* Frame information for each part message, like lineno
+* Frame information for each part message, like filename, function, lineno
 
 * Any logging mechanism can be used, not just standard Python logging.
 
@@ -62,24 +64,40 @@ features and no external dependencies (outside the PSL).
              delimiter="; ",   # delimiter between messages
              tag='',           # add a non-unique label 
              unique_id=False,  # create a uuid to identify the log?
-             level=logging.DEBUG  # what log level? 
+	     verbosity='v'     # level of output for frame information
             )
 ```
 
-`logger`: the standard logger returned from `import logging; logger = logging.getLogger(__name__)`. You can create a `LogTrace()` without a logger in which case it creates one called "logtrace". 
-`delimiter`: the character(s) used between messages
-`tag`: This is a convenience to tell LogTrace() to use hash+tag at the start of every entry after calling `.emit()` for easy of searching.
-`unique_id`: generate a uuid to associate with the final message output.
-`level`: 
+* `logger`: the standard logger returned from `import logging; logger
+  = logging.getLogger(__name__)`. You can create a `LogTrace()`
+  without a logger in which case it creates one called `__name__`.
+
+* `delimiter`: the character(s) used between messages
+
+* `tag`: This is a convenience to tell LogTrace() to use hash+tag at
+  the start of every entry after calling `.emit()` for ease of
+  searching.
+
+* `unique_id`: generate a uuid to associate with the final message output.
+
+* `verbosity`: v, vv, vvv for three levels of verbosity when adding
+  frame information
 
 
 Testing
 -------
 
 	pip install pytest
- 	pytest logtrace/test.py --verbose
+	cd logtrace
+ 	pytest test.py --verbose
+
+or
+
+	python logtrace/test.py
+
 
 
 Performance
 -----------
 
+`LogTrace()` appends to a list of strings everytime you call `add()`. But it firstly calls `insepct.getFrameInfo()` and builds the string with that information. When `emit()` is called, it concatenates all the strings in the list separated by `delimiter` and then calls `logger.info()` or whatever method is appropriate. If the effective level is not the current level for the method, then the list will be empty and it won't do the call to the `logger` method.
