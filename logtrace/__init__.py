@@ -92,6 +92,9 @@ class LogTrace(object):
         
         self.start = time.time()
 
+    def clear(self):
+        self.event_log = []
+        
     def get_uid(self):
         if not self.uid:
             self.uid = uuid.uuid4()

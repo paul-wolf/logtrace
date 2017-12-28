@@ -83,6 +83,29 @@ features and no external dependencies (outside the PSL).
 * `verbosity`: v, vv, vvv for three levels of verbosity when adding
   frame information
 
+`LogTrace.get_uid()`: return the unique id. If one has not be set during construction of the LogTrace, a uuid is generated. Otherwise, it returns the existing one. 
+
+`LogTrace.set_uid(uid)`: Set a unique id. This can be done by constructing `LogTrace()` with `unique_id=True`. This takes normally either a uuid or str argument.  
+
+`LogTrace.add(msg, data, backup)`: Add a message to the list. This will get frame information for the call depending on the verbosity level. 
+
+`LogTrace.emit_string()`: return a string that is the final log message
+
+LogTrace.emit(): call `logger.debug(message)` 
+
+LogTrace.emit_error): call `logger.error(message)`
+
+LogTrace.emit_info(): call `logger.info(message)`
+
+LogTrace.emit_debug(): call `logger.debug(message)`
+
+LogTrace.emit_warning(): call `logger.warning(message)`
+
+LogTrace.emit_critical(): call `logger.critical(message)`
+
+When the `LogTrace` is created, `time.time()` is recorded. Whenever `LogTrace.add()` is called, the time is recorded for when the message is added. The final message prints the number of seconds since creating.
+
+You probably want to avoid including `LogTrace.add()` in loops. You also probably want to create it as a local, not a module-level variable. Pass it as a method argument rather than using a module level instance. If you do want to re-use a `LogTrace` and clear messages, you can call `LogTrace.clear()`. But be aware the uid might need to be reset depending on your application requirements. 
 
 Testing
 -------
