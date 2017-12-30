@@ -83,13 +83,13 @@ features and no external dependencies (outside the PSL).
 * `verbosity`: v, vv, vvv for three levels of verbosity when adding
   frame information
 
-`LogTrace.get_uid()`: return the unique id. If one has not be set during construction of the LogTrace, a uuid is generated. Otherwise, it returns the existing one. 
+`LogTrace.get_uid()`: return the unique id. If one has not been set during construction of the LogTrace, a uuid is generated. Otherwise, it returns the existing one. 
 
 `LogTrace.set_uid(uid)`: Set a unique id. This can be done by constructing `LogTrace()` with `unique_id=True`. This takes normally either a uuid or str argument.  
 
 `LogTrace.add(msg, data, backup)`: Add a message to the list. This will get frame information for the call depending on the verbosity level. 
 
-`LogTrace.emit_string()`: return a string that is the final log message
+`LogTrace.emit_string()`: return a string that is the final log message.
 
 LogTrace.emit(): call `logger.debug(message)` 
 
@@ -107,6 +107,15 @@ When the `LogTrace` is created, `time.time()` is recorded. Whenever `LogTrace.ad
 
 You probably want to avoid including `LogTrace.add()` in loops. You also probably want to create it as a local, not a module-level variable. Pass it as a method argument rather than using a module level instance. If you do want to re-use a `LogTrace` and clear messages, you can call `LogTrace.clear()`. But be aware the uid might need to be reset depending on your application requirements. 
 
+Extra Data
+----------
+
+`LogTrace.add()` has an optional parameter `data` that takes a dictionary. We keep a dict in the object and `update()` it whenever the `data` parameter is used. This doesn't do anything within `LogTrace` itself other than maintain the `data` member variable. But you can accumulate data and later ship the data to a service like AWS S3 or whatever, like this:
+
+    logger.info(trace.emit_string(), extra=trace.data)
+
+This would be useful if you are using a logging handler that ships the `logging.LogRecord` as JSON to some service like a document oriented data store, Elasticsearch, etc.
+
 Testing
 -------
 
@@ -118,9 +127,7 @@ or
 
 	python logtrace/test.py
 
-
-
 Performance
 -----------
 
-`LogTrace()` appends to a list of strings everytime you call `add()`. But it firstly calls `insepct.getFrameInfo()` and builds the string with that information. When `emit()` is called, it concatenates all the strings in the list separated by `delimiter` and then calls `logger.info()` or whatever method is appropriate. If the effective level is not the current level for the method, then the list will be empty and it won't do the call to the `logger` method.
+`LogTrace()` appends to a list of strings everytime you call `add()`. But it firstly calls `inspect.getFrameInfo()` and builds the string with that information. When `emit()` is called, it concatenates all the strings in the list separated by `delimiter` and then calls `logger.info()` or whatever method is appropriate. If the effective level is not the current level for the method, then the list will be empty and it won't do the call to the `logger` method.
