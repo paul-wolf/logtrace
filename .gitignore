@@ -2,6 +2,7 @@
 .cache
 *~
 venv*
+.venv*
 env3
 
 # C extensions

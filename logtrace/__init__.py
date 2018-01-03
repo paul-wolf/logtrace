@@ -65,7 +65,7 @@ class LogTrace(object):
                  delimiter="; ",  # delimiter between parts
                  tag='',  # add a label to the log entry, non-unique
                  unique_id=False,  # create a uuid to identify the log?
-                 level=None,
+                 level=None, # default level if you want to use emit()
                  verbosity='v'):
         self.uid = None
         self.verbosity = verbosity
@@ -89,11 +89,20 @@ class LogTrace(object):
         if unique_id:
             self.uid = uuid.uuid4()
         self.clean = False
+
+        self.emit_funcs = {
+            logging.DEBUG: self.logger.debug,
+            logging.INFO: self.logger.info,            
+            logging.WARNING: self.logger.warning,            
+            logging.ERROR: self.logger.error,
+            logging.CRITICAL: self.logger.critical,
+        }
         
         self.start = time.time()
 
     def clear(self):
         self.event_log = []
+        self.start = time.time()
         
     def get_uid(self):
         if not self.uid:
@@ -168,7 +177,7 @@ class LogTrace(object):
             log.emit(emit_func=logger.error)
 
         backup: how many frames to go back in the stack 
-        for the actually relevant caller
+        for the actually relevant calling frame
 
         """
         if not self.logger.getEffectiveLevel() >= self.logger.level:
@@ -183,9 +192,9 @@ class LogTrace(object):
         extra = {}
 
         if not emit_func:
-            self.logger.debug(self.build_message(), extra=extra)
-        else:
-            emit_func(self.build(), extra=extra)
+            emit_func = self.emit_funcs[self.level]
+
+        emit_func(self.build_message(), extra=extra)
 
     def emit_error(self, msg, delimiter=None):
         self.emit(msg, delimiter, emit_func=self.logger.error, backup=3)

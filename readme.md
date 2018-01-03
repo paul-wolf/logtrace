@@ -3,7 +3,7 @@ LogTrace
 
 [![Build Status](https://travis-ci.org/paul-wolf/logtrace.svg?branch=master)](https://travis-ci.org/paul-wolf/logtrace)
 
-Aggregate messages to produce a log entry representing a single event or procedure.
+Aggregate messages to produce a log entry representing a single event or procedure. The purpose of this module is to easily asssociate log messages together that belong together.
 
 ```
 import logging
@@ -27,15 +27,32 @@ You get a single log entry like this:
 [05/Jan/2018 11:11:00] DEBUG [21, .30s] Let's get started; [65, .132s] Later, something else happens; [75, .330s] And finally...
 ```
 
-The purpose of this module is to easily asssociate log messages
-together that belong together.
-
 Install
 -------
 
 	pip install logtrace
 
 Note that this only suppports Python 3. Let me know if anyone wants support for Python 2. There are no dependencies outside the Python Standard Library for this module. 
+
+Example
+-------
+
+Logs can be hard to read because you have cases where you log information as you go through a procedure. These log entries get scattered with all the other logs from other processes. You end up having to search for related entries possibly implanting identifying information in each one to tie them together. `LogTrace` fixes this problem by letting you collect logs and then output once. Take the example of a token authentication procedure where transient tokens are required to be authenticated. You want to record the following events:
+
+* Check the HTTP header info with the token
+* What table are we going to use to check the token?
+* Did the token service authenticate the token?
+* Is the token in a local cache?
+* Successfully authenticated? 
+
+The following records five separate instances where you would have called `logger.info()` with a line number and the time in seconds since constructing the `LogTrace` object `[<lineno>, <secs>s]`: 
+
+```
+[12:12:54] INFO [132, 0.0006s] auth header: [b'Token', b'2c59999137******************************']; [132, 0.0007s] authenticate key, model: <class 'tastypie.models.ApiKey'>; [132, 0.1057s] token renewal for API call confirmed; [132, 0.1078s] got key from token table: paul; [163, 0.1079s] Successfully authenticated
+```
+
+Details
+-------
 
 We respect logging levels. So, the overhead of using LogTrace is minimal if your log level is not effective. If your log level is `logging.INFO` and you call `logtrace.emit_debug()`, almost all overhead is avoided minus some function call overhead and one or two conditional expressions. 
 
@@ -53,8 +70,6 @@ We also provide other features like
 
 * Pass structured data (json).
 
-* Enable log messages to be parsed
-
 We wanted to provide something that works in perfect harmony with the
 existing Python logging module without unnecessary duplication of
 features and no external dependencies (outside the PSL).
@@ -64,7 +79,7 @@ features and no external dependencies (outside the PSL).
              delimiter="; ",   # delimiter between messages
              tag='',           # add a non-unique label 
              unique_id=False,  # create a uuid to identify the log?
-	     verbosity='v'     # level of output for frame information
+	         verbosity='v'     # level of output for frame information
             )
 ```
 
@@ -91,21 +106,21 @@ features and no external dependencies (outside the PSL).
 
 `LogTrace.emit_string()`: return a string that is the final log message.
 
-LogTrace.emit(): call `logger.debug(message)` 
+`LogTrace.emit()`: call `logger.debug(message)` 
 
-LogTrace.emit_error): call `logger.error(message)`
+`LogTrace.emit_error()`: call `logger.error(message)`
 
-LogTrace.emit_info(): call `logger.info(message)`
+`LogTrace.emit_info()`: call `logger.info(message)`
 
-LogTrace.emit_debug(): call `logger.debug(message)`
+`LogTrace.emit_debug()`: call `logger.debug(message)`
 
-LogTrace.emit_warning(): call `logger.warning(message)`
+`LogTrace.emit_warning()`: call `logger.warning(message)`
 
-LogTrace.emit_critical(): call `logger.critical(message)`
+`LogTrace.emit_critical()`: call `logger.critical(message)`
 
-When the `LogTrace` is created, `time.time()` is recorded. Whenever `LogTrace.add()` is called, the time is recorded for when the message is added. The final message prints the number of seconds since creating.
+When the `LogTrace` is created, `time.time()` is recorded. Whenever `LogTrace.add()` is called, the start time is subtracted from the current time when the message is added. The final message prints the number of seconds since creating.
 
-You probably want to avoid including `LogTrace.add()` in loops. You also probably want to create it as a local, not a module-level variable. Pass it as a method argument rather than using a module level instance. If you do want to re-use a `LogTrace` and clear messages, you can call `LogTrace.clear()`. But be aware the uid might need to be reset depending on your application requirements. 
+You probably want to avoid including `LogTrace.add()` in loops. You also probably want to create it as a local, not a module-level variable. Pass it as a method argument rather than using a module level instance. If you do want to re-use a `LogTrace` and clear messages, you can call `LogTrace.clear()`. But be aware the uid might need to be reset depending on your application requirements.
 
 Extra Data
 ----------
@@ -125,7 +140,7 @@ Testing
 
 or
 
-	python logtrace/test.py
+	python3 logtrace/test.py
 
 Performance
 -----------
