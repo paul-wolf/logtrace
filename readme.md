@@ -62,13 +62,13 @@ We also provide other features like
 
 * Easily generate a UUID for the logged event.
 
-* Timings for each message.
+* Timing for each message since LogTrace was created.
 
 * Frame information for each part message, like filename, function, lineno
 
 * Any logging mechanism can be used, not just standard Python logging.
 
-* Pass structured data (json).
+* Pass structured data (JSON).
 
 We wanted to provide something that works in perfect harmony with the
 existing Python logging module without unnecessary duplication of
@@ -85,7 +85,7 @@ features and no external dependencies (outside the PSL).
 
 * `logger`: the standard logger returned from `import logging; logger
   = logging.getLogger(__name__)`. You can create a `LogTrace()`
-  without a logger in which case it creates one called `__name__`.
+  without a logger in which case it creates with the value of `__name__`.
 
 * `delimiter`: the character(s) used between messages
 
