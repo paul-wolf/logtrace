@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2013-2015, Yewleaf Ltd.
+# Copyright (c) 2017-2018, Paul Wolf.
 # All rights reserved.
 
 # Redistribution and use in source and binary forms, with or without
@@ -37,7 +37,7 @@ import time
 import inspect
 import logging
 
-__version__ = '0.0.1'
+__version__ = '0.1.1'
 __author__ = 'Paul Wolf'
 __license__ = 'BSD'
 
