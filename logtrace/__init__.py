@@ -152,8 +152,8 @@ class LogTrace(object):
         if data:
             self._add_data(data)
 
-    def build_message(self):
-        msg = self.delimiter.join(self.event_log)
+    def build_message(self, delimiter):
+        msg = delimiter.join(self.event_log)
         if self.clean:
             msg = msg.replace(delimiter, '_')
 
@@ -170,7 +170,7 @@ class LogTrace(object):
         if msg:
             self.add(msg, backup=backup)
 
-        return self.build_message()
+        return self.build_message(delimiter=delimiter)
 
     def emit(self, msg=None, delimiter=None, emit_func=None, backup=2, **extra):
         """Call emit function on self.logger which
@@ -198,7 +198,7 @@ class LogTrace(object):
         if not emit_func:
             emit_func = self.emit_funcs[self.level]
 
-        emit_func(self.build_message(), **extra)
+        emit_func(self.build_message(delimiter=delimiter), **extra)
 
     def emit_error(self, msg, delimiter=None):
         self.emit(msg, delimiter, emit_func=self.logger.error, backup=3)
