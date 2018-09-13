@@ -41,14 +41,16 @@ __version__ = '0.1.1'
 __author__ = 'Paul Wolf'
 __license__ = 'BSD'
 
-# __all__ = (
-#     'LogTrace',
-# )
+__all__ = (
+    'LogTrace',
+)
+
 
 def clean(s, chars):
     """Clean string s of characters in chars."""
     translation_table = dict.fromkeys(map(ord, chars), '_')
-    return s.translate(translation_table)    
+    return s.translate(translation_table)
+
 
 def parse(s, delimiter):
     """
@@ -58,14 +60,15 @@ def parse(s, delimiter):
 
     """
     pass
-    
+
+
 class LogTrace(object):
     def __init__(self,
                  logger=None,  # we'll emit output here
                  delimiter="; ",  # delimiter between parts
                  tag='',  # add a label to the log entry, non-unique
                  unique_id=False,  # create a uuid to identify the log?
-                 level=None, # default level if you want to use emit()
+                 level=None,  # default level if you want to use emit()
                  verbosity='v'):
         self.uid = None
         self.verbosity = verbosity
@@ -92,18 +95,18 @@ class LogTrace(object):
 
         self.emit_funcs = {
             logging.DEBUG: self.logger.debug,
-            logging.INFO: self.logger.info,            
-            logging.WARNING: self.logger.warning,            
+            logging.INFO: self.logger.info,
+            logging.WARNING: self.logger.warning,
             logging.ERROR: self.logger.error,
             logging.CRITICAL: self.logger.critical,
         }
-        
+
         self.start = time.time()
 
     def clear(self):
         self.event_log = []
         self.start = time.time()
-        
+
     def get_uid(self):
         if not self.uid:
             self.uid = uuid.uuid4()
@@ -111,8 +114,8 @@ class LogTrace(object):
 
     def set_uid(self, uid):
         """
-        Accepts a string or uuid. Adds it to self.uid as a uuid. 
-        We want to not care which it is. Any string can be used for this. 
+        Accepts a string or uuid. Adds it to self.uid as a uuid.
+        We want to not care which it is. Any string can be used for this.
         """
         if not (isinstance(uid, uuid.UUID) or isinstance(uid, str)):
             uid = str(uid)
@@ -121,7 +124,8 @@ class LogTrace(object):
     def _add_message(self, msg, backup=1):
         """Append msg to logs only if log level is effective."""
         if not self.logger.getEffectiveLevel() >= self.logger.level:
-            print("WARNING, not adding message, effective level: {}, level={}".format(self.logger.getEffectiveLevel(), self.logger.level))
+            print("WARNING, not adding message, effective level: {}, level={}".format(self.logger.getEffectiveLevel(),
+                                                                                      self.logger.level))
             return
 
         f = inspect.currentframe()
@@ -135,7 +139,7 @@ class LogTrace(object):
                                                    i.lineno, time.time() - self.start, msg)
         elif self.verbosity == 'vvv':
             msg = "[{0}.{1}:{2}, {3:.4f}s] {4}".format(i.filename, i.function,
-                                                      i.lineno, time.time() - self.start, msg)
+                                                       i.lineno, time.time() - self.start, msg)
         self.event_log.append(msg)
 
     def _add_data(self, data):
@@ -168,33 +172,33 @@ class LogTrace(object):
 
         return self.build_message(delimiter=delimiter)
 
-    def emit(self, msg=None, delimiter=None, emit_func=None, backup=2):
-        """Call emit function on self.logger which 
+    def emit(self, msg=None, delimiter=None, emit_func=None, backup=2, **extra):
+        """Call emit function on self.logger which
         defaults to logger.debug
 
         or call emit_func which should be something like:
 
             log.emit(emit_func=logger.error)
 
-        backup: how many frames to go back in the stack 
+        backup: how many frames to go back in the stack
         for the actually relevant calling frame
 
+        If you want to pass any additional options into logger.debug etc
+            functions - just use **extra params.
         """
         if not self.logger.getEffectiveLevel() >= self.logger.level:
             return
-        
+
         if not delimiter:
             delimiter = self.delimiter
 
         if msg:
             self.add(msg, backup=backup)
 
-        extra = {}
-
         if not emit_func:
             emit_func = self.emit_funcs[self.level]
 
-        emit_func(self.build_message(delimiter=delimiter), extra=extra)
+        emit_func(self.build_message(delimiter=delimiter), **extra)
 
     def emit_error(self, msg, delimiter=None):
         self.emit(msg, delimiter, emit_func=self.logger.error, backup=3)
@@ -210,6 +214,3 @@ class LogTrace(object):
 
     def emit_critical(self, msg, delimiter=None):
         self.emit(msg, delimiter, emit_func=self.logger.critical, backup=3)
-
-
-
