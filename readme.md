@@ -131,6 +131,12 @@ Extra Data
 
 This would be useful if you are using a logging handler that ships the `logging.LogRecord` as JSON to some service like a document oriented data store, Elasticsearch, etc.
 
+You also could pass extra params via `.emit` call like
+```
+trace = LogTrace(logger=logger)
+trace.emit('message', extra={'key': 'value'})
+```
+
 Testing
 -------
 

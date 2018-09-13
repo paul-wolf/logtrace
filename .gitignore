@@ -24,6 +24,7 @@ lib
 lib64
 __pycache__
 MANIFEST
+.idea/
 
 # Installer logs
 pip-log.txt
