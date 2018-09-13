@@ -37,7 +37,7 @@ import time
 import inspect
 import logging
 
-__version__ = '0.1.1'
+__version__ = '0.1.2'
 __author__ = 'Paul Wolf'
 __license__ = 'BSD'
 

@@ -146,3 +146,12 @@ Performance
 -----------
 
 `LogTrace()` appends to a list of strings everytime you call `add()`. But it firstly calls `inspect.getFrameInfo()` and builds the string with that information. When `emit()` is called, it concatenates all the strings in the list separated by `delimiter` and then calls `logger.info()` or whatever method is appropriate. If the effective level is not the current level for the method, then the list will be empty and it won't do the call to the `logger` method.
+
+Acknowledgements
+----------------
+
+Thanks to
+
+.. @metazet: https://github.com/metazet
+
+For important fixes. 
